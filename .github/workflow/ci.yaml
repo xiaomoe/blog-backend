@@ -1,0 +1,34 @@
+name: CI
+on: [push]
+
+jobs:
+  code-quality:
+    name: "Code Quality"
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11"]
+        pdm-version: ["2.4.2"]
+        os: [ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up PDM (with Python)
+        uses: pdm-project.setup-pdm@v3
+        with:
+          python-version: ${{ matrix.python-version }}
+          version: ${{ matrix.pdm-version }}
+      - name: Install dependencies
+        run: |
+          pdm sync -d
+      - name: Run Black
+        run: |
+          pdm run -v black . --check --exclude=tests/
+      - name: Run Ruff
+        run: |
+          pdm run -v ruff --format=github .
+      - name: Run Mypy
+        run: |
+          pdm run -v mypy . --prety
+      - name: Run Safety
+        run: pdm run -v safety check
