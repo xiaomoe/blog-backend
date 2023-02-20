@@ -3,7 +3,9 @@ name = ""
 version = ""
 description = ""
 authors = [{ name = "xiaomoe", email = "studyxiao@163.com" }]
-dependencies = []
+dependencies = [
+    "flask>=2.2.3",
+]
 requires-python = ">=3.11"
 license = { text = "MIT" }
 

@@ -1,0 +1,57 @@
+services:
+  web:
+    container_name: blog_web
+    build:
+      context: .
+      dockerfile: ./compose/dev/Dockerfile
+    networks:
+      - backend
+    volumes:
+      - .:/app
+    ports:
+      - 8000:5000
+    env_file:
+      - .env
+    # tty: true
+    command:
+      [
+        "flask",
+        "--app",
+        "start:app",
+        "run",
+        "--host",
+        "0.0.0.0"
+      ]
+    # command: bash -c "flask --app start:app run --host 0.0.0.0"
+    init: true
+    depends_on:
+      - db
+      - redis
+  db:
+    image: mysql:8.0.31
+    ports:
+      - 3306:3306
+    networks:
+      - backend
+    privileged: true
+    volumes:
+      - mysql_data:/var/lib/mysql
+      # - ./compose/dev/mysql/init.d:/docker-entrypoint-initdb.d
+      # - ./compose/dev/mysql/config:/etc/mysql/conf.d
+    env_file:
+      - .env
+  redis:
+    image: redis:7-alpine
+    ports:
+      - 6379:6379
+    networks:
+      - backend
+    env_file:
+      - .env
+
+networks:
+  backend:
+
+
+volumes:
+  mysql_data:
