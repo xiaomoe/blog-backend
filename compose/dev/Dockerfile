@@ -13,6 +13,7 @@ RUN --mount=type=cache,target=/root/.cache/pdm \
 
 FROM python:3.11.2-slim-bullseye
 
+ENV PYTHONUNBUFFERED=1
 ENV PYTHONPATH=/pkgs/lib
 ENV PATH="/pkgs/bin:${PATH}"
 COPY --from=builder /__pypackages__/3.11 /pkgs

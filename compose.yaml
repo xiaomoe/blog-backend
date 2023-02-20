@@ -12,6 +12,8 @@ services:
       - 8000:5000
     env_file:
       - .env
+    environment:
+      - FLASK_DEBUG=1
     # tty: true
     command:
       [
@@ -36,8 +38,8 @@ services:
     privileged: true
     volumes:
       - mysql_data:/var/lib/mysql
-      # - ./compose/dev/mysql/init.d:/docker-entrypoint-initdb.d
-      # - ./compose/dev/mysql/config:/etc/mysql/conf.d
+      # - ./compose/dev/mysql/initdb.d:/docker-entrypoint-initdb.d
+      - ./compose/dev/mysql/config:/etc/mysql/conf.d
     env_file:
       - .env
   redis:
@@ -48,6 +50,7 @@ services:
       - backend
     env_file:
       - .env
+    command: [ "redis-server", "--requirepass", "${REDIS_PASSWORD}" ]
 
 networks:
   backend:
