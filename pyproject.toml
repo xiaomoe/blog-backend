@@ -11,6 +11,7 @@ dependencies = [
     "cryptography>=39.0.1",
     "sqlalchemy>=2.0.4",
     "redis>=4.5.1",
+    "orjson>=3.8.6",
 ]
 requires-python = ">=3.11"
 license = { text = "MIT" }
@@ -51,9 +52,12 @@ select = [
     # "PTH",
     "ANN",
 ]
-ignore = ['D211', 'D213']
+ignore = ['D211', 'D213', 'ANN101', 'ANN401']
 # include .gitignore
 respect-gitignore = true
+
+[tool.ruff.flake8-builtins]
+builtins-ignorelist = ["dict"]
 
 [tool.mypy]
 strict = true

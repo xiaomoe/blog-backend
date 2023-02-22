@@ -1,5 +1,8 @@
 name: CI
-on: [push]
+on:
+  push:
+    branches:
+      - main
 
 jobs:
   code-quality:
@@ -23,7 +26,7 @@ jobs:
           pdm sync -d
       - name: Run Black
         run: |
-          pdm run -v black . --check --exclude=tests/
+          pdm run -v black . --check
       - name: Run Ruff
         run: |
           pdm run -v ruff --format=github .

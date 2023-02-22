@@ -4,11 +4,11 @@ from flask import Flask
 
 from src.config import config
 
-from .app import db, redis
+from .app import APIFlask, db, redis
 
 
 def create_app() -> Flask:
-    app = Flask(__name__)
+    app = APIFlask(__name__)
 
     app.config.from_object(config)
 
