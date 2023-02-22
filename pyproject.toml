@@ -52,7 +52,7 @@ select = [
     # "PTH",
     "ANN",
 ]
-ignore = ['D211', 'D213', 'ANN101', 'ANN401']
+ignore = ['D211', 'D213', 'ANN101', 'ANN401', 'N818']
 # include .gitignore
 respect-gitignore = true
 

@@ -28,6 +28,28 @@ class ToAsDictLike(t.Protocol):
         ...
 
 
+class APIException(Exception):
+    code: int = 500
+    error_code: int = 10000
+    message: str = "内部错误"
+
+    def __init__(self, code: int | None = None, error_code: int | None = None, message: str | None = None) -> None:
+        if code is not None:
+            self.code = code
+        if error_code is not None:
+            self.error_code = error_code
+        if message is not None:
+            self.message = message
+        super().__init__()
+
+    def dict(self) -> dict[str, t.Any]:
+        return {
+            "code": self.code,
+            "error_code": self.error_code,
+            "message": self.message,
+        }
+
+
 class OrJSONProvider(JSONProvider):
     """替换 Flask 内部 JSON Provider 为 OrJson
 
@@ -80,6 +102,7 @@ class APIFlask(Flask):
             root_path,
         )
         self.register_error_handler(HTTPException, self.error_handler_http)
+        self.register_error_handler(APIException, self.error_handler_api)
 
     def make_response(self, rv: ResponseReturnValue) -> Response:
         """change to json Response"""
@@ -104,3 +127,7 @@ class APIFlask(Flask):
             "error_code": 999,
             "message": error.description,
         }
+
+    @staticmethod
+    def error_handler_api(error: APIException) -> ResponseReturnValue:
+        return error.dict(), error.code
