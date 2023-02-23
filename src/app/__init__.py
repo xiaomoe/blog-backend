@@ -3,8 +3,9 @@ from typing import Any
 from flask import Flask
 
 from src.config import config
+from src.util.validation import body, parameter
 
-from .app import APIException, APIFlask, db, redis
+from .app import APIFlask
 from .cli import regsiter_cli
 
 
@@ -14,18 +15,22 @@ def create_app() -> Flask:
     app.config.from_object(config)
     regsiter_cli(app)
 
-    @app.get("/")
-    def index() -> dict[str, Any]:
-        with db.connect() as conn:
-            print(conn)
-        redis.set("a", 1)
-        print(redis.get("a"))
+    from pydantic import BaseModel
 
-        class NotFound(APIException):
-            code: int = 404
-            message: str = "Not Found."
+    class Page(BaseModel):
+        page: int = 0
+        count: int = 10
 
-        raise NotFound
-        return {"msg": "Hello World"}
+    class User(BaseModel):
+        name: str
+
+    @app.post("/")
+    @parameter(Page)
+    @body(User)
+    def index(user: User, page: Page) -> dict[str, Any]:
+        return {
+            "user": user,
+            "page": page,
+        }
 
     return app
