@@ -5,12 +5,14 @@ from flask import Flask
 from src.config import config
 
 from .app import APIException, APIFlask, db, redis
+from .cli import regsiter_cli
 
 
 def create_app() -> Flask:
     app = APIFlask(__name__)
 
     app.config.from_object(config)
+    regsiter_cli(app)
 
     @app.get("/")
     def index() -> dict[str, Any]:
