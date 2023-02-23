@@ -35,22 +35,6 @@ class APIException(Exception):
     error_code: int = 10000
     message: str = "内部错误"
 
-    # def __init__(self, code: int | None = None, error_code: int | None = None, message: str | None = None) -> None:
-    #     if code is not None:
-    #         self.code = code
-    #     if error_code is not None:
-    #         self.error_code = error_code
-    #     if message is not None:
-    #         self.message = message
-    #     super().__init__()
-
-    def dict(self) -> dict[str, t.Any]:
-        return {
-            "code": self.code,
-            "error_code": self.error_code,
-            "message": self.message,
-        }
-
 
 class OrJSONProvider(JSONProvider):
     """替换 Flask 内部 JSON Provider 为 OrJson
@@ -60,19 +44,21 @@ class OrJSONProvider(JSONProvider):
     """
 
     def dumps(self, obj: t.Any, **kwargs: t.Any) -> str:
-        try:
-            res = orjson.dumps(obj)
-        except Exception:
-            # deal with other type
-            if isinstance(obj, ToDictLike):
-                res = orjson.dumps(obj.dict())
-            if isinstance(obj, ToAsDictLike):
-                res = orjson.dumps(obj.as_dict())
-            raise
+        res = orjson.dumps(obj, default=self.default)
         return res.decode()
 
     def loads(self, s: str | bytes, **kwargs: t.Any) -> t.Any:
         return orjson.loads(s)
+
+    @staticmethod
+    def default(obj: t.Any) -> dict[str, t.Any]:
+        if isinstance(obj, ToDictLike):
+            res = obj.dict()
+        elif isinstance(obj, ToAsDictLike):
+            res = obj.as_dict()
+        else:
+            raise RuntimeError("返回类型不支持 JSON")
+        return res
 
 
 class APIFlask(Flask):
