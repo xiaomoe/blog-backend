@@ -1,5 +1,6 @@
 import os
 import typing as t
+from dataclasses import asdict, dataclass
 
 import orjson
 from flask import Flask
@@ -28,19 +29,20 @@ class ToAsDictLike(t.Protocol):
         ...
 
 
+@dataclass
 class APIException(Exception):
     code: int = 500
     error_code: int = 10000
     message: str = "内部错误"
 
-    def __init__(self, code: int | None = None, error_code: int | None = None, message: str | None = None) -> None:
-        if code is not None:
-            self.code = code
-        if error_code is not None:
-            self.error_code = error_code
-        if message is not None:
-            self.message = message
-        super().__init__()
+    # def __init__(self, code: int | None = None, error_code: int | None = None, message: str | None = None) -> None:
+    #     if code is not None:
+    #         self.code = code
+    #     if error_code is not None:
+    #         self.error_code = error_code
+    #     if message is not None:
+    #         self.message = message
+    #     super().__init__()
 
     def dict(self) -> dict[str, t.Any]:
         return {
@@ -130,4 +132,4 @@ class APIFlask(Flask):
 
     @staticmethod
     def error_handler_api(error: APIException) -> ResponseReturnValue:
-        return error.dict(), error.code
+        return asdict(error), error.code
