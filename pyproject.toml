@@ -47,9 +47,10 @@ select = [
     "UP", # upgrade
     "A",  # builtins
     # "S",   # bandit
+    "PT",
     "SIM",
     "RUF",
-    # "PTH",
+    "PTH",
     "ANN",
 ]
 ignore = ['D211', 'D213', 'ANN101', 'ANN401', 'N818']
@@ -60,9 +61,11 @@ respect-gitignore = true
 builtins-ignorelist = ["dict"]
 
 [tool.mypy]
-strict = true
-ignore_missing_imports = true
+files = "src"
 python_version = 3.11
+strict = true
+show_error_codes = true
+ignore_missing_imports = true
 check_untyped_defs = false
 disallow_untyped_calls = false
 disallow_untyped_decorators = false
