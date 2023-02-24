@@ -2,6 +2,7 @@ from typing import Any
 
 from flask import Flask
 
+from src.common.cos import cos
 from src.config import config
 from src.util.validation import body, parameter
 
@@ -32,5 +33,9 @@ def create_app() -> Flask:
             "user": user,
             "page": page,
         }
+
+    @app.get("/")
+    def index_get() -> dict[str, Any]:
+        return cos.get_credential()
 
     return app

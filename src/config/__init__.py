@@ -11,6 +11,12 @@ class BaseConfig(BaseSettings):
     SQLALCHEMY_DATABASE_URI: str = ""
     REDIS_URL: str = "redis://localhost:6379/0"
 
+    # qcloud 腾讯 cos 设置
+    COS_SECRET_ID: str = ""
+    COS_SECRET_KEY: str = ""
+    COS_BUCKET: str = ""
+    COS_REGION: str = ""
+
     class Config:
         env_file: str = ".env"
 
