@@ -17,12 +17,10 @@ services:
     # tty: true
     command:
       [
-        "flask",
-        "--app",
-        "start:app",
-        "run",
-        "--host",
-        "0.0.0.0"
+        "gunicorn",
+        "--config",
+        "./src/config/gunicorn.py",
+        "start:app"
       ]
     # command: bash -c "flask --app start:app run --host 0.0.0.0"
     init: true
