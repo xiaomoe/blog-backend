@@ -1,3 +1,4 @@
+from datetime import timedelta
 from pathlib import Path
 
 from pydantic import BaseSettings
@@ -18,6 +19,10 @@ class BaseConfig(BaseSettings):
 
     # log
     LOG_LEVEL: str = "INFO"
+
+    # secret
+    ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_EXPIRES_DELTA: timedelta = timedelta(hours=2)
 
     class Config:
         env_file: str = ".env"
