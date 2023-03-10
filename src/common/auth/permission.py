@@ -57,7 +57,7 @@ def permission_meta(
 
     def decorator_permission(func: Callable[P, R]) -> Callable[P, R]:
         # 收集权限信息 用于后面添加到数据库 permission 表中
-        func_name = func.__name__
+        func_name = func.__module__ + "." + func.__qualname__
         meta = PermissionMeta(module, auth, func_name)
         permission_metas.add(meta)
         if required:
