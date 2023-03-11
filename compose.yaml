@@ -22,7 +22,6 @@ services:
         "./src/config/gunicorn.py",
         "start:app"
       ]
-    # command: bash -c "flask --app start:app run --host 0.0.0.0"
     init: true
     depends_on:
       - db
@@ -43,18 +42,18 @@ services:
       - .env
     restart: always
   redis:
-    build: ./compose/dev/redis/master/
-    # sysctls:
-    #   - vm.overcommit_memory = 1
-    # image: redis:7-alpine
+    build: ./compose/dev/redis/single/
     ports:
       - 6379:6379
     networks:
       - backend
     volumes:
-      - ./compose/dev/redis/master/redis.conf:/redis.conf
+      - ./compose/dev/redis/single/redis.conf:/redis.conf
+      - cache:/data
     env_file:
       - .env
+    environment:
+      - ENABLE_OVERCOMMIT_MEMORY=true
     restart: always
     command:
       [
@@ -63,119 +62,11 @@ services:
         "--masterauth",
         "${REDIS_PASSWORD}"
       ]
-  redis_1:
-    build: ./compose/dev/redis/master/
-    # sysctls:
-    #   - vm.overcommit_memory = 1
-    ports:
-      - 6380:6380
-    networks:
-      - backend
-    volumes:
-      - ./compose/dev/redis/replica/redis.conf:/redis.conf
-    env_file:
-      - .env
-    restart: always
-    depends_on:
-      - redis
-    command:
-      [
-        "--requirepass",
-        "${REDIS_PASSWORD}",
-        "--masterauth",
-        "${REDIS_PASSWORD}"
-      ]
-  redis_2:
-    build: ./compose/dev/redis/master/
-    # sysctls:
-    #   - vm.overcommit_memory = 1
-    ports:
-      - 6381:6380
-    networks:
-      - backend
-    volumes:
-      - ./compose/dev/redis/replica/redis.conf:/redis.conf
-    env_file:
-      - .env
-    restart: always
-    depends_on:
-      - redis
-    command:
-      [
-        "--requirepass",
-        "${REDIS_PASSWORD}",
-        "--masterauth",
-        "${REDIS_PASSWORD}"
-      ]
-  sentinel_1:
-    build: ./compose/dev/redis/sentinel/
-    ports:
-      - 26379:26379
-    networks:
-      - backend
-    volumes:
-      - ./compose/dev/redis/sentinel/sentinel_1.conf:/sentinel.conf
-    env_file:
-      - .env
-    restart: always
-    depends_on:
-      - redis
-      - redis_1
-      - redis_2
-    command:
-      [
-        "--sentinel",
-        "auth-pass",
-        "redis",
-        "${REDIS_PASSWORD}"
-      ]
-  sentinel_2:
-    build: ./compose/dev/redis/sentinel/
-    ports:
-      - 26380:26380
-    networks:
-      - backend
-    volumes:
-      - ./compose/dev/redis/sentinel/sentinel_2.conf:/sentinel.conf
-    env_file:
-      - .env
-    restart: always
-    depends_on:
-      - redis
-      - redis_1
-      - redis_2
-    command:
-      [
-        "--sentinel",
-        "auth-pass",
-        "redis",
-        "${REDIS_PASSWORD}"
-      ]
-  sentinel_3:
-    build: ./compose/dev/redis/sentinel/
-    ports:
-      - 26381:26381
-    networks:
-      - backend
-    volumes:
-      - ./compose/dev/redis/sentinel/sentinel_3.conf:/sentinel.conf
-    env_file:
-      - .env
-    restart: always
-    depends_on:
-      - redis
-      - redis_1
-      - redis_2
-    command:
-      [
-        "--sentinel",
-        "auth-pass",
-        "redis",
-        "${REDIS_PASSWORD}"
-      ]
+
 networks:
   backend:
 
 
 volumes:
   mysql_data:
+  cache:

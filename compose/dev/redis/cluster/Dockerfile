@@ -1,5 +1,3 @@
-# produces redisfab/redis-py-cluster:6.2.6
-# FROM redis:6.2.6-buster
 FROM redis:7-alpine
 
 COPY create_cluster.sh /create_cluster.sh
