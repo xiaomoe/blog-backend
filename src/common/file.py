@@ -1,8 +1,7 @@
-"""本地上传
-"""
+"""本地上传."""
 import hashlib
 from collections.abc import Iterable
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
 from uuid import uuid1
 
@@ -13,7 +12,7 @@ from src.util.exception import RequestParamsError
 
 
 class Uploader:
-    """本地上传
+    """本地上传.
 
     files: request.files
     """
@@ -25,7 +24,7 @@ class Uploader:
     path: Path | str | None = None  # 存储路径
 
     def __init__(self, files: ImmutableMultiDict[str, FileStorage]) -> None:
-        """files: request.files"""
+        """files: request.files."""
         self.init_config()
         self.file_storages: list[FileStorage] = []
         self.get_file_storage(files)
@@ -33,12 +32,6 @@ class Uploader:
 
     def init_config(self) -> None:
         # """优先使用 config 中配置项"""
-        # if hasattr(config, "FILE"):
-        #     self.nums = config.FILE.NUMS
-        #     self.single_max_size = config.FILE.SINGLE_MAX_SIZE
-        #     self.all_max_size = config.FILE.ALL_MAX_SIZE
-        #     self.extensions = config.FILE.EXTENSIONS
-        #     self.path = config.FILE.PATH
         if self.path is None:
             self.path = Path(config.BASE_DIR) / "assets"
         else:
@@ -47,12 +40,12 @@ class Uploader:
             Path(self.path).mkdir(parents=True, exist_ok=True)
 
     def get_file_storage(self, files: ImmutableMultiDict[str, FileStorage]) -> None:
-        """files: request.files"""
+        """files: request.files."""
         for key, _ in files.items():
             self.file_storages += files.getlist(key)
 
     def verify(self) -> None:
-        """验证是否符合条件"""
+        """验证是否符合条件."""
         if self.file_storages == []:
             raise RequestParamsError(message="未传入文件")
         self._check_extention()
@@ -91,29 +84,26 @@ class Uploader:
     @staticmethod
     def __get_ext(file: FileStorage) -> str:
         filename = file.filename or ""
-        ext = filename.split(".")[-1]
-        return ext
+        return filename.split(".")[-1]
 
     def rename(self, file: FileStorage) -> str:
         uuid = uuid1().hex
-        name = f"{uuid}.{self.__get_ext(file)}"
-        return name
+        return f"{uuid}.{self.__get_ext(file)}"
 
     @staticmethod
     def generate_md5(file: FileStorage) -> str:
-        md5 = hashlib.md5()
+        md5 = hashlib.md5()  # noqa
         md5.update(file.read())
         file.seek(0)
-        res = md5.hexdigest()
-        return res
+        return md5.hexdigest()
 
     def upload(self) -> list[dict[str, str]]:
-        """存储在本地
+        """存储在本地.
 
         TODO 增加数据库信息
         """
         result = []
-        time = datetime.now()
+        time = datetime.now(UTC)
         relation_path = f"{time.year}/{time.month}/{time.day}"
         path = Path(self.path or "") / relation_path
         path.mkdir(parents=True, exist_ok=True)

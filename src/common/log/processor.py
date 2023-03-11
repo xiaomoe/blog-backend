@@ -45,7 +45,7 @@ def combined_logformat(
         event_dict.update(res)
 
         del event_dict["event"]
-        # del event_dict["host"]
+        # del event_dict["host"]  # noqa
         del event_dict["user"]
         del event_dict["time"]
         del event_dict["size"]

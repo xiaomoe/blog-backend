@@ -13,12 +13,11 @@ from src.config import config
 
 
 class COS:
-    """申请腾讯 COS 临时 token
+    """申请腾讯 COS 临时 token.
 
     修改自: https://github.com/tencentyun/qcloud-cos-sts-sdk/blob/master/python/README.md
     """
 
-    # config: Config
     url: str = "https://sts.tencentcloudapi.com/"
     domain: str = "sts.tencentcloudapi.com"  # 域名 默认为 sts.tencentcloudapi.com
     duration_seconds: int = 1800  # 临时密钥有效时长(秒) 默认 1800 半小时, 最大 7200 两小时
@@ -72,9 +71,8 @@ class COS:
         appid = str(self.bucket[(split_index + 1) :]).strip()
         self.resource = []
         for prefix in self.allow_prefix:
-            if not str(prefix).startswith("/"):
-                prefix = f"/{prefix}"
-            self.resource.append(f"qcs::cos:{self.region}:uid/{appid}:{self.bucket}{prefix}")
+            _prefix = f"/{prefix}" if not prefix.startswith("/") else prefix
+            self.resource.append(f"qcs::cos:{self.region}:uid/{appid}:{self.bucket}{_prefix}")
 
         policy = {
             "version": "2.0",
@@ -103,12 +101,12 @@ class COS:
         data["Signature"] = self.__encrypt("POST", self.domain, data)
         result_json = None
         try:
-            response = requests.post(self.url, data=data)
+            response = requests.post(self.url, data=data, timeout=15)
             result_json = response.json()
             if isinstance(result_json["Response"], dict):
                 result_json = result_json["Response"]
             return result_json  # type: ignore
-        except Exception as e:
+        except Exception as e:  # noqa
             result = "error: "
             if result_json is not None:
                 result = str(result_json)
@@ -120,8 +118,7 @@ class COS:
         key = bytes(self.secret_key, encoding="utf-8")
         source = bytes(_source, encoding="utf-8")
         sign = hmac.new(key, source, hashlib.sha1).digest()
-        sign = base64.b64encode(sign).rstrip()
-        return sign
+        return base64.b64encode(sign).rstrip()
 
 
 # 单例模式
@@ -145,4 +142,4 @@ if __name__ == "__main__":
         bucket=os.getenv("COS_BUCKET", ""),
         region=os.getenv("COS_REGION", ""),
     )
-    print("result: ", cos.get_credential())
+    print("result: ", cos.get_credential())  # noqa

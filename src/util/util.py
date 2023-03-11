@@ -4,7 +4,7 @@ from types import ModuleType
 
 
 def import_all_modules(path: str, query: str = "**/[!__]*.py") -> list[ModuleType]:
-    """导入 path 路径下的所有除__开头的 py 文件并返回所有模块
+    """导入 path 路径下的所有除__开头的 py 文件并返回所有模块.
 
     Args:
         path (str): 所在文件夹或当前文件 __file__

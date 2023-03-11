@@ -1,4 +1,9 @@
-from .auth import Auth as Auth
-from .permission import admin_required as admin_required
-from .permission import permission_meta as permission_meta
-from .permission import permission_metas as permission_metas
+from .auth import Auth
+from .permission import admin_required, permission_meta, permission_metas
+
+__all__ = (
+    "Auth",
+    "admin_required",
+    "permission_meta",
+    "permission_metas",
+)

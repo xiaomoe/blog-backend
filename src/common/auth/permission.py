@@ -79,12 +79,11 @@ def permission_meta(
 
 
 def admin_required(func: Callable[P, R]) -> Callable[P, R]:
-    """管理员权限验证"""
+    """管理员权限验证."""
 
     @wraps(func)
     def wrapper_admin_required(*args: P.args, **kwargs: P.kwargs) -> R:
         user = current_user.get()
-        print(user)
         if user is None:
             raise Unauthorization(message="请登录")
         if not user.is_admin():

@@ -4,8 +4,26 @@ repos:
     hooks:
       - id: black
         language_version: python3.11
-        args: [--check]
+        args: [--config=./pyproject.toml, --check]
   - repo: https://github.com/charliermarsh/ruff-pre-commit
     rev: v0.0.254
     hooks:
       - id: ruff
+        args: [--fix]
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.1.1
+    hooks:
+      - id: mypy
+        args: [--config-file=./pyproject.toml]
+        exclude: "compose|docs"
+        additional_dependencies:
+          [
+            pydantic,
+            sqlalchemy>2.0,
+            structlog,
+            types-redis,
+            types-requests,
+            flask,
+            pyjwt,
+            orjson,
+          ]

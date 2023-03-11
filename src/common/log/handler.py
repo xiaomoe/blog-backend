@@ -5,7 +5,8 @@ from pathlib import Path
 
 
 class LinRotatingFileHandler(BaseRotatingHandler):
-    """
+    """RotatingFileHandler.
+
     The logs are saved in monthly folders, named after year and month, and each day is saved into a file named after
     the year, month, and day. Logs are rotated daily or when they exceed a specified maximum size, and are renamed to
     include the current time in case the filename already exists.
@@ -39,7 +40,7 @@ class LinRotatingFileHandler(BaseRotatingHandler):
             mode = "a"
         self._log_dir = Path(log_dir).resolve()
         self._suffix = ".log"
-        now = datetime.datetime.now()
+        now = datetime.datetime.now(datetime.UTC)
         self._year_month = now.strftime("%Y-%m")
         self.store_dir = self._log_dir / self._year_month
         self.store_dir.mkdir(parents=True, exist_ok=True)
@@ -49,7 +50,7 @@ class LinRotatingFileHandler(BaseRotatingHandler):
         self.max_bytes = max_bytes
 
     def doRollover(self) -> None:  # noqa
-        now = datetime.datetime.now()
+        now = datetime.datetime.now(datetime.UTC)
         year_month = now.strftime("%Y-%m")
         filename = now.strftime("%Y-%m-%d")
 
@@ -75,7 +76,7 @@ class LinRotatingFileHandler(BaseRotatingHandler):
 
     def shouldRollover(self, record: logging.LogRecord) -> bool:  # noqa
         """Determine if a rollover should occur."""
-        now = datetime.datetime.now()
+        now = datetime.datetime.now(datetime.UTC)
         year_month = now.strftime("%Y-%m")
         filename = now.strftime("%Y-%m-%d")
 

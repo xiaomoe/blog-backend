@@ -30,6 +30,7 @@ dev = [
     "types-redis>=4.5.1.1",
     "types-requests>=2.28.11.14",
     "rich>=13.3.1",
+    "refurb>=1.13.0",
 ]
 doc = [
     "mkdocs>=1.4.2",
@@ -43,27 +44,66 @@ line-length = 120
 [tool.ruff]
 line-length = 120
 target-version = "py311"
+src = ["src"]
 
 select = [
-    "F",  # pyflake
-    "E",  # pycodestyle
-    "W",  # pycodestyle
-    "B",  # bugbear
-    "N",  # naming
-    "I",  # isort
-    "UP", # upgrade
-    "A",  # builtins
-    # "S",   # bandit
-    "PT",
-    "SIM",
-    "RUF",
-    "PTH",
+    "A",   # flake8-builtins
     "ANN",
-    "DTZ", #tzinfo 
+    "B",   # flake8-bugbear
+    "BLE", # flake8-blind-except
+    "C4",  # flake8-comprehensions
+    "C90", # mccabe
+    "D",   # pydocstyle
+    "DJ",  # flake8-django
+    "DTZ", # flake8-datetimez
+    "E",   # pycodestyle errors
+    "ERA", # eradicate
+    "EXE", # flake8-executable
+    "F",   # pyflakes
+    "G",   # flake8-logging-format
+    # "I",   # isort
+    "ICN", # flake8-import-conventions
+    "ISC", # flake8-implicit-str-concat
+    "N",   # pep8-naming
+    "PIE", # flake8-pie
+    "PLC", # pylint - convention
+    "PLE", # pylint - error
+    "PLW", # pylint - warning
+    "PT",
+    "PTH", # flake8-use-pathlib
+    "Q",   # flake8-quotes
+    "RET", # flake8-return
+    "RUF", # Ruff-specific rules
+    "S",   # flake8-bandit
+    "SIM", # flake8-simplify
+    "T10", # flake8-debugger
+    "T20", # flake8-print
+    "TCH", # flake8-type-checking
+    "TID", # flake8-tidy-imports
+    "UP",  # pyupgrade
+    "W",   # pycodestyle - warning
+    "YTT", # flake8-2020
 ]
-ignore = ['D211', 'D213', 'ANN101', 'ANN401', 'N818']
+ignore = [
+    "D100",   # pydocstyle - missing docstring in public module
+    "D101",   # pydocstyle - missing docstring in public class
+    "D102",   # pydocstyle - missing docstring in public method
+    "D103",   # pydocstyle - missing docstring in public function
+    "D104",   # pydocstyle - missing docstring in public package
+    "D105",   # pydocstyle - missing docstring in magic method
+    "D106",   # pydocstyle - missing docstring in public nested class
+    "D107",   # pydocstyle - missing docstring in __init__
+    'D211',
+    'D213',
+    'ANN101',
+    'ANN401',
+    'N818',
+]
 # include .gitignore
 respect-gitignore = true
+
+[tool.ruff.pydocstyle]
+convention = "google"
 
 [tool.ruff.flake8-builtins]
 builtins-ignorelist = ["dict", "format", "id"]
@@ -77,3 +117,6 @@ ignore_missing_imports = true
 check_untyped_defs = false
 disallow_untyped_calls = false
 disallow_untyped_decorators = false
+
+[tool.refurb]
+python_version = "3.11"

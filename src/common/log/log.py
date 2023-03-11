@@ -1,4 +1,4 @@
-"""基于 structlog 的日志收集一揽子方案
+"""基于 structlog 的日志收集一揽子方案.
 
 该模块旨在提供一个基于 Structlog 的日志包装器来产生更好的日志记录体验,
 它可以将 web 请求期间捕获的所有信息整合到单个日志记录中。
@@ -29,7 +29,7 @@ stdlib_and_struct_processors: list[structlog.typing.Processor] = [
 
 
 class Logger:
-    """该类是一个基于 Structlog 日志全局初始化封装, 用于将全局信息集中到单个日志中。
+    """该类是一个基于 Structlog 日志全局初始化封装, 用于将全局信息集中到单个日志中.
 
     全局日志设置应在入口处初始化该类。
 
@@ -69,7 +69,7 @@ class Logger:
 
             self.renderer = structlog.dev.ConsoleRenderer(colors=False)
             # 还可以使用 json
-            # self.renderer = structlog.processors.JSONRenderer(serializer=json.dumps)
+            # >>> self.renderer = structlog.processors.JSONRenderer(serializer=json.dumps)
         else:
             self.renderer = structlog.dev.ConsoleRenderer(colors=True)
 
@@ -77,7 +77,7 @@ class Logger:
         self.init_stdliblog()
 
     def init_structlog(self) -> None:
-        """设置全局 structlog 配置"""
+        """设置全局 structlog 配置."""
         structlog.configure(
             processors=[
                 *self.processors,
@@ -91,7 +91,7 @@ class Logger:
         )
 
     def init_stdliblog(self) -> None:
-        """设置标准库 root logger"""
+        """设置标准库 root logger."""
         formatter = structlog.stdlib.ProcessorFormatter(
             foreign_pre_chain=self.processors,
             processors=[

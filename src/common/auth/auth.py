@@ -14,7 +14,7 @@ from .interface import LoginScheme, User
 P = ParamSpec("P")
 R = TypeVar("R")
 
-# user = current_user.get()
+# >>> user = current_user.get()
 # 可以使用 proxy 封装以便直接使用 current_user
 current_user: ContextVar[User | None] = ContextVar("user")
 
@@ -26,7 +26,7 @@ class JWTToken:
 
     @classmethod
     def encode_token(cls: type["JWTToken"], data: dict[str, str]) -> str:
-        """Encodes the payload and returns a JWT token"""
+        """Encodes the payload and returns a JWT token."""
         expire = datetime.now(UTC) + cls.access_token_expires
         data["exp"] = str(int(expire.timestamp()))
 
@@ -34,7 +34,7 @@ class JWTToken:
 
     @classmethod
     def decode_token(cls: type["JWTToken"], token: str) -> dict[str, str]:
-        """Decodes the JWT token and returns the payload"""
+        """Decodes the JWT token and returns the payload."""
         try:
             return jwt.decode(token, cls.secret_key, [cls.algorithm])
         except jwt.ExpiredSignatureError:
@@ -81,19 +81,16 @@ class Auth:
 
     @staticmethod
     def get_bearer_token(silent: bool = False) -> str | None:
-        """Extracts the token from the authorization header"""
-        authorization = request.headers.get("Authorization")
+        """Extracts the token from the authorization header."""
+        authorization = request.headers.get("Authorization", "")
         if not authorization or not authorization.startswith("Bearer "):
             if silent:
                 return None
-            else:
-                raise Unauthorization()
-        token = authorization[7:]
-
-        return token
+            raise Unauthorization()
+        return authorization[7:]
 
     def authenticate(self, username: str, password: str, scope: str = "") -> dict[str, str]:
-        """Authenticates the user and returns an access token"""
+        """Authenticates the user and returns an access token."""
         scopes = scope.split()  # noqa
         user = self.user.validate(username, password)
         if user is None:
@@ -103,7 +100,7 @@ class Auth:
         return {"access_token": token}
 
     def identify(self, silent: bool = False) -> User | None:
-        """Returns the current user"""
+        """Returns the current user."""
         token = self.get_bearer_token(silent)
         if token is None:
             return None
@@ -112,10 +109,8 @@ class Auth:
         if user is None:
             if silent:
                 return None
-            else:
-                raise RequestParamsError(code=400, message="Invalid user")
+            raise RequestParamsError(code=400, message="Invalid user")
         return user
 
     def login(self, data: LoginScheme) -> dict[str, str]:
-        access_token = self.authenticate(data.username, data.password)
-        return access_token
+        return self.authenticate(data.username, data.password)

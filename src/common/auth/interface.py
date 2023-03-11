@@ -1,6 +1,4 @@
-# from collections.abc import ABC
-# from collections.abc import ABCMeta
-from abc import ABCMeta, abstractclassmethod, abstractmethod
+from abc import ABC, abstractclassmethod, abstractmethod
 from typing import TYPE_CHECKING, Protocol, Self
 
 from pydantic import BaseModel
@@ -11,7 +9,7 @@ if TYPE_CHECKING:
 
 class User(Protocol):
     def get_primary_value(self) -> str:
-        """获得主键值
+        """获得主键值.
 
         Examples:
         >>> return str(self.id)
@@ -20,7 +18,7 @@ class User(Protocol):
 
     @classmethod
     def validate(cls, username: str, password: str) -> Self | None:  # noqa
-        """验证用户是否存在和密码是否正确
+        """验证用户是否存在和密码是否正确.
 
         Examples:
         >>> user = cls.get(username)
@@ -32,7 +30,7 @@ class User(Protocol):
 
     @classmethod
     def get_instance_by_primary(cls, value: str) -> Self | None:  # noqa
-        """根据主键获取实例
+        """根据主键获取实例.
 
         Examples:
         >>> return cls.get(int(value))
@@ -46,19 +44,18 @@ class User(Protocol):
         ...
 
 
-class UserInter(metaclass=ABCMeta):
+class UserInter(ABC):
     @abstractmethod
     def get_primary_value(self) -> str:
-        """获得主键值
+        """获得主键值.
 
         Examples:
         >>> return str(self.id)
         """
-        pass
 
     @abstractclassmethod
     def validate(cls, username: str, password: str) -> Self | None:  # noqa
-        """验证用户是否存在和密码是否正确
+        """验证用户是否存在和密码是否正确.
 
         Examples:
         >>> user = cls.get(username)
@@ -66,16 +63,14 @@ class UserInter(metaclass=ABCMeta):
         ...     return None
         >>> return check_password(password, user.password)
         """
-        pass
 
     @abstractclassmethod
     def get_instance_by_primary(cls, value: str) -> Self | None:  # noqa
-        """根据主键获取实例
+        """根据主键获取实例.
 
         Examples:
         >>> return cls.get(int(value))
         """
-        pass
 
     @abstractmethod
     def is_admin(self) -> bool:

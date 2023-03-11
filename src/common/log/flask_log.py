@@ -32,8 +32,9 @@ class FlaskLogger:
             http_version = request.environ.get("SERVER_PROTOCOL")
             status_code = response.status_code
             remote_addr = request.remote_addr
+            message = f'{remote_addr} - "{http_method} {url} HTTP/{http_version}" {status_code}'
             access_logger.info(
-                f"""{remote_addr} - "{http_method} {url} HTTP/{http_version}" {status_code}""",
+                message,
                 http={
                     "url": f"{request.url}",
                     "status_code": status_code,

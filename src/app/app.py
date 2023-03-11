@@ -37,7 +37,7 @@ class APIException(Exception):
 
 
 class OrJSONProvider(JSONProvider):
-    """替换 Flask 内部 JSON Provider 为 OrJson
+    """替换 Flask 内部 JSON Provider 为 OrJson.
 
     Args:
         JSONProvider (flask.json.provider.JSONProvider): internal json
@@ -93,7 +93,7 @@ class APIFlask(Flask):
         self.register_error_handler(APIException, self.error_handler_api)
 
     def make_response(self, rv: ResponseReturnValue) -> Response:
-        """change to json Response"""
+        """Change to json response."""
         if isinstance(rv, tuple):
             data, *other = rv
             rv = self.json.response(data), *other  # type: ignore

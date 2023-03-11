@@ -30,7 +30,7 @@ class COSResult(TypedDict):
 
 
 class COS:
-    """获取临时凭证(使用官方 SDK)
+    """获取临时凭证(使用官方 SDK).
 
     更多介绍: https://cloud.tencent.com/document/product/1312/48195
     https://github.com/tencentyun/qcloud-cos-sts-sdk/blob/master/python/README.md
@@ -72,4 +72,4 @@ class COS:
 
 if __name__ == "__main__":
     cos = COS()
-    print(cos.get_token())
+    print(cos.get_token())  # noqa

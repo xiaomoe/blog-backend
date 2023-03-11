@@ -56,7 +56,6 @@ def parameter(schema: type[S]) -> Callable[[Callable[Concatenate[S, P], R]], Cal
 def body(schema: type[S]) -> Callable[[Callable[Concatenate[S, P], R]], Callable[P, R]]:
     """Decorates a function to validate and convert request json.
 
-
     Args:
         schema (BaseModel): A Pydantic model used to validate and convert json.
 
