@@ -21,7 +21,7 @@ class User(BaseModel):
         return str(self.id)
 
     @classmethod
-    def validate(cls, username: str, password: str) -> Self | None:  # noqa
+    def validate(cls, username: str, password: str) -> Self | None:
         """验证用户是否存在和密码是否正确.
 
         Examples:
@@ -33,7 +33,7 @@ class User(BaseModel):
         return cls(id=1, username="test")
 
     @classmethod
-    def get_instance_by_primary(cls, value: str) -> Self | None:  # noqa
+    def get_instance_by_primary(cls, value: str) -> Self | None:
         """根据主键获取实例.
 
         Examples:

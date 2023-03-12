@@ -96,6 +96,7 @@ ignore = [
     'D211',
     'D213',
     'ANN101',
+    'ANN102',
     'ANN401',
     'N818',
 ]
@@ -106,7 +107,7 @@ respect-gitignore = true
 convention = "google"
 
 [tool.ruff.flake8-builtins]
-builtins-ignorelist = ["dict", "format", "id"]
+builtins-ignorelist = ["dict", "format", "id", "set"]
 
 [tool.mypy]
 files = "src"

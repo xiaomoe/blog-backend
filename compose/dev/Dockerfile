@@ -2,6 +2,7 @@
 FROM python:3.11.2-slim-bullseye as builder
 
 # install pdm
+# hadolint ignore=DL3042
 RUN --mount=type=cache,target=/root/.cache/pip \
     pip install pdm==2.4.5
 
