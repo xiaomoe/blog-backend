@@ -1,27 +1,24 @@
 from typing import TYPE_CHECKING, Self
 
-from sqlalchemy import String
-from sqlalchemy.orm import DeclarativeBase, MappedColumn, mapped_column
+from sqlalchemy import Column, String
 
 if TYPE_CHECKING:
     from src.common.auth.permission import PermissionMeta
 
-
-class BaseModel(DeclarativeBase):
-    pass
+from sqlmodel import SQLModel
 
 
-class User(BaseModel):
+class User(SQLModel):
     __tablename__ = "user"
-    id: MappedColumn[int] = mapped_column(primary_key=True, autoincrement=True, comment="主键")
-    username: MappedColumn[str] = mapped_column(String(255), unique=True, nullable=False)
-    password: MappedColumn[str] = mapped_column(String(255))
+    id = Column(primary_key=True, autoincrement=True, comment="主键")
+    username = Column(String(255), unique=True, nullable=False)
+    password = Column(String(255))
 
     def get_primary_value(self) -> str:
         return str(self.id)
 
     @classmethod
-    def validate(cls, username: str, password: str) -> Self | None:
+    def validate(cls, username: str, password: str) -> Self | None:  # type:ignore
         """验证用户是否存在和密码是否正确.
 
         Examples:

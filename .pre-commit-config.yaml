@@ -6,7 +6,7 @@ repos:
         language_version: python3.11
         args: [--config=./pyproject.toml, --check]
   - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: v0.0.254
+    rev: v0.0.256
     hooks:
       - id: ruff
         args: [--fix]
@@ -19,7 +19,7 @@ repos:
         additional_dependencies:
           [
             pydantic,
-            sqlalchemy>2.0,
+            sqlmodel,
             structlog,
             types-redis,
             types-requests,
