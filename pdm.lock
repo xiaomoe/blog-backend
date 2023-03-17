@@ -76,6 +76,25 @@ version = "0.3.6"
 summary = "Distribution utilities"
 
 [[package]]
+name = "elastic-transport"
+version = "8.4.0"
+requires_python = ">=3.6"
+summary = "Transport classes and utilities shared among Python Elastic client libraries"
+dependencies = [
+    "certifi",
+    "urllib3<2,>=1.26.2",
+]
+
+[[package]]
+name = "elasticsearch"
+version = "8.6.2"
+requires_python = ">=3.6, <4"
+summary = "Python client for Elasticsearch"
+dependencies = [
+    "elastic-transport<9,>=8",
+]
+
+[[package]]
 name = "filelock"
 version = "3.10.0"
 requires_python = ">=3.7"
@@ -607,7 +626,7 @@ dependencies = [
 
 [metadata]
 lock_version = "4.1"
-content_hash = "sha256:b2c5ddee6f2c9d047fa28bdd53fb2d03d2b45bddcababc1f4c98c7521c8a27e8"
+content_hash = "sha256:f4a1fae590d760bf95a8ccb611932ef74e49b5b72f5a07bfa64e218542a6bc0c"
 
 [metadata.files]
 "async-timeout 4.0.2" = [
@@ -828,6 +847,14 @@ content_hash = "sha256:b2c5ddee6f2c9d047fa28bdd53fb2d03d2b45bddcababc1f4c98c7521
 "distlib 0.3.6" = [
     {url = "https://files.pythonhosted.org/packages/58/07/815476ae605bcc5f95c87a62b95e74a1bce0878bc7a3119bc2bf4178f175/distlib-0.3.6.tar.gz", hash = "sha256:14bad2d9b04d3a36127ac97f30b12a19268f211063d8f8ee4f47108896e11b46"},
     {url = "https://files.pythonhosted.org/packages/76/cb/6bbd2b10170ed991cf64e8c8b85e01f2fb38f95d1bc77617569e0b0b26ac/distlib-0.3.6-py2.py3-none-any.whl", hash = "sha256:f35c4b692542ca110de7ef0bea44d73981caeb34ca0b9b6b2e6d7790dda8f80e"},
+]
+"elastic-transport 8.4.0" = [
+    {url = "https://files.pythonhosted.org/packages/91/23/9d00188faa9f1d62654e6e35761e320837e5f43c893e3935535adf40226d/elastic-transport-8.4.0.tar.gz", hash = "sha256:b9ad708ceb7fcdbc6b30a96f886609a109f042c0b9d9f2e44403b3133ba7ff10"},
+    {url = "https://files.pythonhosted.org/packages/bd/3b/a2f4a4f1f7578ceaff490961753a75984efc17c17b1f6f59c3a866debeca/elastic_transport-8.4.0-py3-none-any.whl", hash = "sha256:19db271ab79c9f70f8c43f8f5b5111408781a6176b54ab2e54d713b6d9ceb815"},
+]
+"elasticsearch 8.6.2" = [
+    {url = "https://files.pythonhosted.org/packages/7c/60/e09c002d1095f00e6beae17cdf1c845a2aa2e4c22a15843c55a99aa4e67c/elasticsearch-8.6.2.tar.gz", hash = "sha256:084458e84caa91e3ad807b68aa82c022e785bead853a3b125641a25e894a1d47"},
+    {url = "https://files.pythonhosted.org/packages/f7/43/f73f5a5cc40b1943f90a895b248a4985a4b23aa25439d7919bc6ab147398/elasticsearch-8.6.2-py3-none-any.whl", hash = "sha256:8ccbebd9a0f6f523c7db67bb54863dde8bdb93daae4ff97f7c814e0500a73e84"},
 ]
 "filelock 3.10.0" = [
     {url = "https://files.pythonhosted.org/packages/4f/1f/6e1b740698069650b245744957a25957d599b953550a959ab2a584a8825b/filelock-3.10.0.tar.gz", hash = "sha256:3199fd0d3faea8b911be52b663dfccceb84c95949dd13179aa21436d1a79c4ce"},
