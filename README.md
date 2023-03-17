@@ -4,6 +4,19 @@
 
 blog backend of Moe.
 
+> 本项目还在迭代中。
+
+- 统一异常处理
+- 参数校验
+- 静态资源处理
+- 权限管理 jwt RBAC
+- 定时任务/任务队列
+- redis 缓存系统
+- websocket 通信
+- 统一日志处理
+- ~~代码规范(部分)~~
+
+
 ## TODO
 
 - cos token 获取需要错误重试
