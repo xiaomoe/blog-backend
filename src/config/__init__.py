@@ -9,6 +9,7 @@ class BaseConfig(BaseSettings):
 
     SECRET_KEY: str = "123456"
     SQLALCHEMY_DATABASE_URI: str
+    SQLALCHEMY_POOL_SIZE: int = 10
 
     # redis
     REDIS_URL: str
