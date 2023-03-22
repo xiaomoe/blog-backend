@@ -1,3 +1,5 @@
+from typing import Any
+
 from flask import Blueprint
 from sqlalchemy import update
 from src.common.auth import current_user, login_required
@@ -15,8 +17,8 @@ bp = Blueprint("notice", __name__, url_prefix="/notice")
 @bp.get("")
 @login_required
 @parameter(NoticeSchema)
-def get_all_message(params: NoticeSchema):
-    # 获取所有消息，type指定为1是获取用户所有消息，0是获取所有未读消息
+def get_all_message(params: NoticeSchema) -> dict[str, Any]:
+    # 获取所有消息 type指定为1是获取用户所有消息, 0是获取所有未读消息
     user = current_user.get()
     notices = []
     count = 0
@@ -28,17 +30,17 @@ def get_all_message(params: NoticeSchema):
         # 获取未读消息
         notices = Notice.get_all(page=params.page, count=params.count, to_user_id=user.id, is_read=0)
         count = Notice.count(to_user_id=user.id, is_read=0)
-    return ResultPageSchema(
+    return ResultPageSchema(  # type: ignore
         page=params.page,
         count=params.count,
         total=count,
-        items=notices,
-    )
+        items=list(notices),
+    ).dict()
 
 
 @bp.put("/<int:id>")
 @login_required
-def notice_is_read(id):
+def notice_is_read(id: int) -> dict[str, str]:
     user = current_user.get()
     notice = Notice.get_model_by_id(id)
     if notice is None:
@@ -49,12 +51,12 @@ def notice_is_read(id):
         raise ParameterError(message="通知已读")
     notice.is_read = 1
     notice.save()
-    return Updated(message="已读")
+    return Updated(message="已读").to_dict()
 
 
 @bp.put("")
 @login_required
-def notice_all_is_read():
+def notice_all_is_read() -> dict[str, str]:
     user = current_user.get()
     with session:
         session.execute(
@@ -66,4 +68,4 @@ def notice_all_is_read():
             .values(is_read=1)
         )
         session.commit()
-    return Updated(message="已读所有")
+    return Updated(message="已读所有").to_dict()

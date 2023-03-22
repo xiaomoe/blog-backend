@@ -5,18 +5,19 @@ from typing import ParamSpec, TypeVar
 import jwt
 from flask import Flask, Response, request
 
+from src.app.model.user import User
 from src.config import config
 from src.util.exception import RequestParamsError, Unauthorization
 from src.util.validation import body
 
-from .interface import LoginScheme, User
+from .interface import LoginScheme  # , User
 
 P = ParamSpec("P")
 R = TypeVar("R")
 
 # >>> user = current_user.get()
 # 可以使用 proxy 封装以便直接使用 current_user
-current_user: ContextVar[User | None] = ContextVar("user")
+current_user: ContextVar[User] = ContextVar("user")
 
 
 class JWTToken:
@@ -72,7 +73,8 @@ class Auth:
 
     def before_request(self) -> None:
         user = self.identify(silent=True)
-        self.current_user_token = current_user.set(user)
+        if user is not None:
+            self.current_user_token = current_user.set(user)
 
     def after_request(self, response: Response) -> Response:
         if hasattr(self, "current_user_token") and self.current_user_token:

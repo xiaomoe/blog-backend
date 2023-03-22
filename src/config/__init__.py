@@ -12,6 +12,7 @@ class BaseConfig(BaseSettings):
     SQLALCHEMY_POOL_SIZE: int = 10
 
     # redis
+    REDIS_PASSWORD: str
     REDIS_URL: str
 
     # qcloud 腾讯 cos 设置
@@ -19,6 +20,13 @@ class BaseConfig(BaseSettings):
     COS_SECRET_KEY: str
     COS_BUCKET: str
     COS_REGION: str
+
+    # 腾讯 sms
+    SMS_SECRET_ID: str
+    SMS_SECRET_KEY: str
+    SMS_APP_ID: str
+    SMS_SIGN_NAME: str
+    SMS_TEMPLATE: str
 
     # log
     LOG_LEVEL: str = "INFO"

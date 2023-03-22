@@ -1,4 +1,5 @@
 from flask import Blueprint
+from flask.typing import ResponseValue
 from sqlalchemy import select
 from src.common.auth import current_user, permission_meta
 from src.common.db import session
@@ -14,7 +15,7 @@ bp = Blueprint("comment", __name__, url_prefix="/comment")
 
 @bp.route("", methods=["GET"])
 @parameter(CommentSchema)
-def get_comments(params: CommentSchema):
+def get_comments(params: CommentSchema) -> ResponseValue:
     with session:
         comments = session.scalars(
             select(Comment)
@@ -31,7 +32,7 @@ def get_comments(params: CommentSchema):
         }
         for comment in comments:
             replay = session.scalars(select(Comment).where(Comment.root_id == comment.id).limit(3)).all()
-            item = comment.dict()
+            item = comment.to_dict()
             item["replay"] = replay
             res["items"].append(item)
     return res
@@ -39,7 +40,7 @@ def get_comments(params: CommentSchema):
 
 @bp.route("/replay", methods=["GET"])
 @parameter(ReplaySchema)
-def get_replay(params: ReplaySchema):
+def get_replay(params: ReplaySchema) -> ResponseValue:
     comment = Comment.get_model_by_id(params.comment_id)
     if comment is None:
         raise ParameterError(message="评论不存在")
@@ -56,7 +57,7 @@ def get_replay(params: ReplaySchema):
 @bp.route("", methods=["POST"])
 @permission_meta(auth="发表评论", module="comment")
 @body(CommentCreateSchema)
-def create_comment(body: CommentCreateSchema):
+def create_comment(body: CommentCreateSchema) -> ResponseValue:
     # 从 request 中获得 ip、客户端、设备信息
     user = current_user.get()
     post = Post.get_model_by_id(body.post_id)
@@ -73,7 +74,7 @@ def create_comment(body: CommentCreateSchema):
             raise ParameterError(message="父评论不存在")
     comment = Comment(
         post_id=body.post_id,
-        user_id=user.id,  # type: ignore
+        user_id=user.id,
         root_id=body.root_id,
         parent_id=body.parent_id,
         content=body.content,
@@ -82,4 +83,4 @@ def create_comment(body: CommentCreateSchema):
     if root_comment:
         root_comment.replay_count += 1
         root_comment.save()
-    return Created(message="创建评论成功")
+    return Created(message="创建评论成功").to_dict()

@@ -1,7 +1,7 @@
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from functools import wraps
-from typing import ParamSpec, TypeVar
+from typing import ParamSpec, TypeVar, overload
 
 from src.util.exception import Forbidden, Unauthorization
 
@@ -91,6 +91,16 @@ def admin_required(func: Callable[P, R]) -> Callable[P, R]:
         return func(*args, **kwargs)
 
     return wrapper_admin_required
+
+
+@overload
+def login_required(func: Callable[P, R]) -> Callable[P, R]:
+    ...
+
+
+@overload
+def login_required(*, optional: bool = False) -> Callable[[Callable[P, R]], Callable[P, R]]:
+    ...
 
 
 def login_required(

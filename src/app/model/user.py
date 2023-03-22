@@ -1,5 +1,5 @@
 from datetime import date, datetime
-from typing import TYPE_CHECKING, Self
+from typing import TYPE_CHECKING, Any, Self
 
 from sqlalchemy import BigInteger, Date, Index, SmallInteger, String, select
 from sqlalchemy.orm import Mapped, mapped_column
@@ -8,6 +8,8 @@ from src.common.db import session
 from werkzeug.security import check_password_hash, generate_password_hash
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     from src.common.auth.permission import PermissionMeta
 
 
@@ -80,11 +82,7 @@ class User(BaseModel):
             )
 
             existed_permissions = session.scalars(permission_statement).all()  # 用户拥有的权限
-            if existed_permissions:
-                for item in existed_permissions:
-                    if item.name == meta.auth and item.module == meta.module:
-                        return True
-            return False
+            return any(item.name == meta.auth and item.module == meta.module for item in existed_permissions)
 
     def set_password(self, data: str) -> None:
         """Password 需要 hash."""
@@ -97,6 +95,16 @@ class Role(BaseModel):
     info: Mapped[str | None] = mapped_column(String(255), default="")
     create_time: Mapped[T_create_time] = mapped_column(default=None)
     update_time: Mapped[T_update_time] = mapped_column(default=None)
+
+    @property
+    def permissions(self) -> Sequence["Permission"]:
+        permission_statement = (
+            select(Permission)
+            .join(RolePermission, Permission.id == RolePermission.permission_id)
+            .where(RolePermission.role_id == self.id)
+        )
+
+        return session.scalars(permission_statement).all()
 
 
 class Permission(BaseModel):

@@ -31,20 +31,27 @@ class Success(APIException):
     message: str = "Ok"
     error_code: int = 0
 
+    def to_dict(self) -> dict[str, str]:
+        return {
+            "code": str(self.code),
+            "message": self.message,
+            "error_code": str(self.error_code),
+        }
 
-class Created(APIException):
+
+class Created(Success):
     code: int = 201
     message: str = "创建成功"
     error_code: int = 1
 
 
-class Updated(APIException):
+class Updated(Success):
     code: int = 200
     message: str = "更新成功"
     error_code: int = 2
 
 
-class Deleted(APIException):
+class Deleted(Success):
     code: int = 200
     message: str = "删除成功"
     error_code: int = 3

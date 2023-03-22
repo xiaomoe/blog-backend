@@ -19,7 +19,7 @@ class UserSchema(PageSchema):
 
 
 class UserUpdateSchema(BaseModel):
-    group_id: list[int] | None = Field(default=None, min_items=1)
+    group_id: int
 
 
 class GroupUpdateSchema(BaseModel):

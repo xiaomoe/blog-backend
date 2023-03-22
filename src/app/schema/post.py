@@ -6,6 +6,7 @@ from .common import PageSchema
 
 
 class Tag(TypedDict):
+    id: int
     name: str
 
 
@@ -28,7 +29,7 @@ class PostCreateSchema(BaseModel):
     tags: list[Tag]
 
 
-class PostLike(BaseModel):
+class PostLikeSchema(BaseModel):
     post_id: int
     type: int = 1  # 1 喜欢, 0-取消喜欢
 

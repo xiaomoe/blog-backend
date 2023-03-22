@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+from dataclasses import asdict
 from datetime import datetime
 from typing import TYPE_CHECKING, Annotated, Any, Self
 
@@ -80,6 +81,9 @@ class BaseModel(Declarative):
         for key, value in data.items():
             if hasattr(self, key):
                 setattr(self, key, value)
+
+    def to_dict(self) -> dict[str, Any]:
+        return asdict(self)
 
 
 class User(BaseModel):
