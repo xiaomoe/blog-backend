@@ -1,4 +1,5 @@
 from datetime import date
+from typing import Any
 
 from pydantic import BaseModel, Field, validator
 
@@ -52,15 +53,14 @@ class PostSchema(PageSchema):
         "end_date",
         always=True,
     )
-    def validate_end_date(cls, v, values, **kwargs):
-        # print(v)
-        # print(values)
+    def validate_end_date(cls, v: Any, values: Any, **kwargs: Any) -> Any:  # noqa:N805
+
         if v is None:
             if "start_date" in values and values["start_date"] is not None:
-                raise ValueError("设置起始时间，必须设置结束时间")
+                raise ValueError("设置起始时间, 必须设置结束时间")
         else:
             if "start_date" not in values or values["start_date"] is None:
-                raise ValueError("设置结束时间，必须设置起始时间")
+                raise ValueError("设置结束时间, 必须设置起始时间")
         return v
 
 
@@ -68,7 +68,7 @@ class PostStatusSchema(BaseModel):
     status: int
 
     @validator("status")
-    def validate_status(cls, v):
+    def validate_status(cls, v: Any) -> Any:  # noqa:N805
         if v > 3 or v < 0:
             raise ValueError("只能是0-3直接的数字")
         return v
@@ -94,5 +94,5 @@ class TagCreateSchema(BaseModel):
 
 
 class CommentUpdateSchema(BaseModel):
-    type: int  # 1-置顶，2-拉黑
-    value: int  # 0-取消，1-设置
+    type: int  # 1-置顶, 2-拉黑  # noqa:A003
+    value: int  # 0-取消, 1-设置

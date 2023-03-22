@@ -1,3 +1,5 @@
+from typing import Any
+
 from pydantic import BaseModel, validator
 
 from .common import validate_mobile, validate_password, validate_username
@@ -10,9 +12,9 @@ class CodeSchema(BaseModel):
     _mobile = validator("mobile", allow_reuse=True)(validate_mobile)
 
     @validator("type")
-    def validate_type(cls, val):
+    def validate_type(cls, val: Any) -> Any:  # noqa:N805
         if val > 4 or val < 1:
-            raise ValueError("只能在1，2，3，4中选择")
+            raise ValueError("只能在1, 2, 3, 4中选择")
         return val
 
 
@@ -28,13 +30,13 @@ class ResigerSchema(BaseModel):
     _username = validator("username", allow_reuse=True)(validate_username)
 
     @validator("password2")
-    def check_password2(cls, val, values, **kwargs):
+    def check_password2(cls, val: Any, values: Any, **kwargs: Any) -> Any:  # noqa:N805
         if "password" in values and val != values["password"]:
             raise ValueError("两次密码不一致")
         return val
 
     @validator("code")
-    def check_code(cls, v, values):
+    def check_code(cls, v: Any, values: Any) -> Any:  # noqa:N805
         if len(v) != 4 or (not v.isdigit()):
             raise ValueError("验证码不正确")
         return v
@@ -71,7 +73,7 @@ class ChangePasswordSchema(BaseModel):
     _password = validator("password", allow_reuse=True)(validate_password)
 
     @validator("password2")
-    def check_password2(cls, val, values, **kwargs):
+    def check_password2(cls, val: Any, values: Any, **kwargs: Any) -> Any:  # noqa:N805
         if "password" in values and val != values["password"]:
             raise ValueError("两次密码不一致")
 
@@ -86,12 +88,12 @@ class ResetPasswordSchema(BaseModel):
     _password = validator("password", allow_reuse=True)(validate_password)
 
     @validator("password2")
-    def check_password2(cls, val, values, **kwargs):
+    def check_password2(cls, val: Any, values: Any, **kwargs: Any) -> Any:  # noqa:N805
         if "password" in values and val != values["password"]:
             raise ValueError("两次密码不一致")
 
     @validator("code")
-    def check_code(cls, v, values):
+    def check_code(cls, v: Any, values: Any) -> Any:  # noqa:N805
         if len(v) != 4 or (not v.isdigit()):
             raise ValueError("验证码不正确")
         return v

@@ -109,7 +109,7 @@ respect-gitignore = true
 convention = "google"
 
 [tool.ruff.flake8-builtins]
-builtins-ignorelist = ["dict", "format", "id", "set"]
+builtins-ignorelist = ["dict", "format", "id", "set", "type"]
 
 [tool.mypy]
 files = "src"
