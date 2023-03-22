@@ -1,5 +1,5 @@
 from flask import Blueprint
-from sqlmodel import update
+from sqlalchemy import update
 from src.common.auth import current_user, login_required
 from src.common.db import session
 from src.util.exception import Forbidden, ParameterError, Updated

@@ -1,5 +1,5 @@
 from flask import Blueprint, g
-from sqlmodel import and_, col, delete, func, or_, select
+from sqlalchemy import and_, delete, func, or_, select
 from src.common.auth import login_required, permission_meta
 from src.common.db import session
 from src.util.exception import Created, Deleted, Forbidden, ParameterError, Success, Unautorization, Updated
@@ -33,19 +33,17 @@ def get_posts(params: PostSchema):
         if user is not None:
             current_user = user
 
-    statement = select(Post).order_by(-col(Post.create_time))
+    statement = select(Post).order_by(-Post.create_time)
     if params.category_id:
         statement = statement.where(Post.category_id == params.category_id)
     if current_user is None:
         statement = statement.where(Post.publish < 2)
     else:
-        statement = statement.where(
-            or_(col(Post.publish) < 3, and_(col(Post.publish) == 3, col(Post.user_id) == current_user.id))
-        )
+        statement = statement.where(or_(Post.publish < 3, and_(Post.publish == 3, Post.user_id == current_user.id)))
 
     statement = statement.offset(params.count * params.page).limit(params.count)
     with session:
-        result = session.exec(statement).all()
+        result = session.scalars(statement).all()
         res = []
         for item in result:
             data = item.dict(
@@ -111,9 +109,7 @@ def get_post_archive(params: PostArchiveSchema):
     if user is None:
         statement = statement.where(Post.publish < 2)
     else:
-        statement = statement.where(
-            or_(col(Post.publish) < 3, and_(col(Post.publish) == 3, col(Post.user_id) == user.id))
-        )
+        statement = statement.where(or_((Post.publish) < 3, and_((Post.publish) == 3, (Post.user_id) == user.id)))
     statement.offset(params.count * params.page).limit(params.count)
     with session:
         result = session.exec(statement).all()
@@ -292,7 +288,7 @@ def my_like_posts():
         post_like = session.exec(
             select(PostAttitude.post_id).where(PostAttitude.user_id == user.id, PostAttitude.attitude == 1)
         )
-        posts = session.exec(select(Post).where(col(Post.id).in_(post_like)))
+        posts = session.exec(select(Post).where((Post.id).in_(post_like)))
         return posts
 
 
@@ -304,9 +300,7 @@ def hot_posts():
     if user is None:
         statement = statement.where(Post.publish < 2)
     else:
-        statement = statement.where(
-            or_(col(Post.publish) < 3, and_(col(Post.publish) == 3, col(Post.user_id) == user.id))
-        )
+        statement = statement.where(or_((Post.publish) < 3, and_((Post.publish) == 3, (Post.user_id) == user.id)))
     statement.order_by(func.sum(Post.like_count, Post.comment_count)).offset(0).limit(10)  # 前10条文章
     with session:
         result = session.exec(statement).all()
@@ -340,7 +334,7 @@ def search_tag(params: TagSearchSchema):
     """实时搜索，返回10条"""
     with session:
         return session.exec(
-            select(Tag.id, Tag.name).where(col(Tag.name).like(f"%{params.q}%")).limit(10)  # type: ignore
+            select(Tag.id, Tag.name).where((Tag.name).like(f"%{params.q}%")).limit(10)  # type: ignore
         ).all()  # type:ignore
 
 

@@ -1,91 +1,89 @@
-from datetime import datetime
+from typing import Any
 
-from sqlalchemy import TEXT, Column
-from sqlmodel import Field, Index, delete, select
+from sqlalchemy import TEXT, Index, String, delete, select
+from sqlalchemy.orm import Mapped, mapped_column
+from src.app.model.base import BaseModel, T_create_time, T_update_time
 from src.common.db import session
 
-from .base import BaseSQLModel
 from .user import User
 
 
-class PostCategory(BaseSQLModel, table=True):
-    id: int | None = Field(default=None, primary_key=True)
-    name: str = Field(..., max_length=32, unique=True, nullable=False, description="分类名称")
-    info: str | None = Field(default=None, max_length=100, description="描述")
-    banner: str | None = Field(default=None, max_length=255, description="背景图")
-    sort: int = Field(default=1, description="排序")
-    status: int = Field(default=1, nullable=False, description="状态：1可见，0-不可见")
-    create_time: datetime | None = Field(default_factory=datetime.now, description="创建时间")
-    update_time: datetime | None = Field(default_factory=datetime.now, description="更新时间")
-    is_deleted: int = Field(default=0, nullable=False, description="是否删除，0-未删除，1-已删除")
+class PostCategory(BaseModel):
+    name: Mapped[str] = mapped_column(String(32), unique=True, comment="分类名称")
+    info: Mapped[str] = mapped_column(String(100), default=None, comment="描述")
+    banner: Mapped[str] = mapped_column(String(255), default=None, comment="背景图")
+    sort: Mapped[int] = mapped_column(default=1, comment="排序")
+    status: Mapped[int] = mapped_column(default=1, comment="状态: 1可见, 0-不可见")
+    create_time: Mapped[T_create_time] = mapped_column(default=None, comment="创建时间")
+    update_time: Mapped[T_update_time] = mapped_column(default=None, comment="更新时间")
+    is_deleted: Mapped[int] = mapped_column(default=0, comment="是否删除, 0-未删除, 1-已删除")
 
     __tableargs__ = (Index("name_del", "name", "is_deleted", unique=True),)
 
 
-class Tag(BaseSQLModel, table=True):
-
-    id: int | None = Field(default=None, primary_key=True)
-    name: str = Field(..., max_length=32, nullable=False, description="标签名称")
-    color: str | None = Field(default=None, max_length=32, description="文字颜色")
-    bg: str | None = Field(default=None, max_length=32, description="背景颜色")
-    status: int = Field(default=1, nullable=False, description="状态(保留字段)：1可见，0-不可见")
+class Tag(BaseModel):
+    name: Mapped[str] = mapped_column(String(32), comment="标签名称")
+    color: Mapped[str] = mapped_column(String(32), default=None, comment="文字颜色")
+    bg: Mapped[str] = mapped_column(String(32), default=None, comment="背景颜色")
+    status: Mapped[int] = mapped_column(default=1, comment="状态(保留字段): 1可见, 0-不可见")
 
 
-class Post(BaseSQLModel, table=True):
+class PostTag(BaseModel):
 
-    id: int | None = Field(default=None, primary_key=True)
-    title: str = Field(..., max_length=128, nullable=False, description="文章标题")
-    summary: str = Field(..., max_length=200, description="简介")
-    content: str = Field(..., sa_column=(Column("content", TEXT)), description="文章内容")
-    cover: str | None = Field(default=None, max_length=255, description="头图 url")
-    category_id: int = Field(default=0, description="所属分类 id， 0 表示没有分类")
-    # tags: str | None = Field(default=None, max_length=255, description="标签 ids")
-    source: int = Field(default=1, description="来源，1-原创，2-转载，3-翻译")
-    publish: int = Field(default=1, description="可见范围：1-公开，2-登录，3-仅自己")
-    status: int = Field(
-        default=1,
-        nullable=False,
-        description="状态：1可见，0-不可见,2-作者置顶，3-管理员置顶",
-    )
-    sort: int = Field(default=1, description="排序")
-    allow_comment: int = Field(default=1, description="是否允许评论, 1-允许，0-不允许")
+    post_id: Mapped[int] = mapped_column(comment="文章 id")
+    tag_id: Mapped[int] = mapped_column(comment="tag id")
 
-    create_time: datetime | None = Field(default_factory=datetime.now, description="创建时间")
-    update_time: datetime | None = Field(default_factory=datetime.now, description="更新时间")
-    is_deleted: int = Field(default=0, nullable=False, description="是否删除,0-未删除，1-已删除")
 
-    user_id: int = Field(..., description="作者 id")
-    view_count: int = Field(default=0, description="文章浏览量")
-    like_count: int = Field(default=0, description="点赞量")
-    comment_count: int = Field(default=0, description="评论数")
+class PostAttitude(BaseModel):
+
+    post_id: Mapped[int] = mapped_column(comment="文章 id")
+    user_id: Mapped[int] = mapped_column(comment="用户 id")
+    attitude: Mapped[int] = mapped_column(comment="态度: 1-喜欢, 0-不喜欢")
+    create_time: Mapped[T_create_time] = mapped_column(default=None, comment="创建时间")
+    update_time: Mapped[T_update_time] = mapped_column(default=None, comment="更新时间")
+
+
+class Post(BaseModel):
+    user_id: Mapped[int] = mapped_column(comment="作者 id")
+    title: Mapped[str] = mapped_column(String(128), comment="文章标题")
+    summary: Mapped[str] = mapped_column(String(200), comment="简介")
+    content: Mapped[str] = mapped_column(TEXT, comment="文章内容")
+    cover: Mapped[str] = mapped_column(String(255), default=None, comment="头图 url")
+    category_id: Mapped[int] = mapped_column(default=0, comment="所属分类 id,  0 表示没有分类")
+    source: Mapped[int] = mapped_column(default=1, comment="来源: 1-原创, 2-转载, 3-翻译")
+    publish: Mapped[int] = mapped_column(default=1, comment="可见范围: 1-公开, 2-登录, 3-仅自己")
+    status: Mapped[int] = mapped_column(default=1, comment="状态: 1可见, 0-不可见,2-作者置顶, 3-管理员置顶")
+    sort: Mapped[int] = mapped_column(default=1, comment="排序")
+    allow_comment: Mapped[int] = mapped_column(default=1, comment="是否允许评论: 1-允许, 0-不允许")
+
+    create_time: Mapped[T_create_time] = mapped_column(default=None, comment="创建时间")
+    update_time: Mapped[T_update_time] = mapped_column(default=None, comment="更新时间")
+    is_deleted: Mapped[int] = mapped_column(default=0, nullable=False, comment="是否删除,0-未删除, 1-已删除")
+
+    view_count: Mapped[int] = mapped_column(default=0, comment="文章浏览量")
+    like_count: Mapped[int] = mapped_column(default=0, comment="点赞量")
+    comment_count: Mapped[int] = mapped_column(default=0, comment="评论数")
 
     __tableargs__ = (Index("name", "name"), Index("status", "status"))
 
-    def update_post(self) -> dict:
-        item = self.dict(exclude={"user_id", "category_id", "tags", "is_deleted"})
-        user = User.get_model_by_id(self.user_id)
-        item["user"] = user
-        category = PostCategory.get_model_by_id(self.category_id)
-        item["category"] = category
-        # tags = []
-        # if self.tags is not None and self.tags != "":
-        #     tags = session.exec(select(PostTag).where(PostTag.id.in_(self.tags.split(",")))).all()  # type:ignore
-        # item["tags"] = tags
-        return item
+    def update_post(self) -> dict[str, Any]:
+        # TODO
+        return {}
 
     @property
-    def tags(self):
+    def tags(self) -> list[Tag]:
         res = []
         with session:
-            _tags = session.exec(select(PostTag.tag_id).where(PostTag.post_id == self.id)).all()
+            _tags = session.scalars(select(PostTag.tag_id).where(PostTag.post_id == self.id)).all()
             for tag_id in _tags:
                 tag = Tag.get_model_by_id(tag_id)
-                res.append(tag)
+                if tag is not None:
+                    res.append(tag)
 
         return res
 
     @tags.setter
-    def tags(self, data: list[dict]):
+    def tags(self, data: list[dict[str, Any]]) -> None:
 
         with session:
             if self.id is None:
@@ -99,12 +97,12 @@ class Post(BaseSQLModel, table=True):
                     session.add(_tag)
                     session.refresh(_tag)
                 new_tags.add(_tag.id)
-            _tags = session.exec(select(PostTag).where(PostTag.post_id == self.id)).all()
-            for item in _tags:
-                old_tags.add(item.tag_id)
+            _tags = session.scalars(select(PostTag).where(PostTag.post_id == self.id)).all()
+            for item in _tags:  # type: ignore
+                old_tags.add(item.tag_id)  # type: ignore
             in_tags = new_tags - old_tags
             out_tags = old_tags - new_tags
-            for item in in_tags:
+            for item in in_tags:  # type: ignore
                 post_tag = PostTag(post_id=self.id, tag_id=item)  # type: ignore
                 session.add(post_tag)
             for item in out_tags:
@@ -112,16 +110,16 @@ class Post(BaseSQLModel, table=True):
             session.commit()
 
     @property
-    def category(self):
+    def category(self) -> dict[str, Any]:
         cate = {"id": 0, "name": "默认分类"}
         if self.category_id > 0:
             res = PostCategory.get_model_by_id(self.category_id)
             if res:
-                cate = res.dict(include={"id", "name"})
+                cate = {"id": res.id, "name": res.name}
         return cate
 
     @property
-    def user(self):
+    def user(self) -> dict[str, Any]:
         user = User.get_model_by_id(self.user_id)
         if user is None:
             return {}
@@ -132,32 +130,15 @@ class Post(BaseSQLModel, table=True):
         }
 
 
-class PostTag(BaseSQLModel, table=True):
-    id: int | None = Field(default=None, primary_key=True)
-    post_id: int = Field(..., description="文章 id")
-    tag_id: int = Field(..., description="tag id")
+class File(BaseModel):
 
-
-class PostAttitude(BaseSQLModel, table=True):
-    id: int | None = Field(default=None, primary_key=True)
-    post_id: int = Field(..., description="文章 id")
-    user_id: int = Field(..., description="用户 id")
-    attitude: int = Field(..., description="态度：1-喜欢，0-不喜欢")
-    create_time: datetime | None = Field(default_factory=datetime.now, description="创建时间")
-    update_time: datetime | None = Field(default_factory=datetime.now, description="更新时间")
-
-
-class File(BaseSQLModel, table=True):
-
-    id: int | None = Field(default=None, primary_key=True)
-    md5: str = Field(..., description="唯一标识")
-    user_id: int = Field(..., description="用户 id")
-    location: int = Field(default=1, description="文件保存位置：1-本地，2-云")
-    type: int = Field(default=0, description="文件类型：0-未知，1-图片，2-视频，3-音频")
-    ext: str | None = Field(default=None, description="后缀")
-    path: str = Field(..., max_length=100, description="路径或 url")
-    name: str = Field(..., description="名称")
-    create_time: datetime | None = Field(default_factory=datetime.now, description="创建时间")
-    update_time: datetime | None = Field(default_factory=datetime.now, description="更新时间")
-
+    md5: Mapped[str] = mapped_column(comment="唯一标识")
+    user_id: Mapped[int] = mapped_column(comment="用户 id")
+    path: Mapped[str] = mapped_column(String(100), comment="路径或 url")
+    name: Mapped[str] = mapped_column(comment="名称")
+    location: Mapped[int] = mapped_column(default=1, comment="文件保存位置: 1-本地, 2-云")
+    type: Mapped[int] = mapped_column(default=0, comment="文件类型: 0-未知, 1-图片, 2-视频, 3-音频")  # noqa：A003
+    ext: Mapped[str] | None = mapped_column(default=None, comment="后缀")
+    create_time: Mapped[T_create_time] = mapped_column(default=None, comment="创建时间")
+    update_time: Mapped[T_update_time] = mapped_column(default=None, comment="更新时间")
     __tableargs__ = (Index("user_file", "user_id", "md5"),)

@@ -2,12 +2,13 @@ from contextvars import ContextVar
 from typing import cast
 
 from flask import Flask
-from sqlmodel import Session, create_engine
+from sqlalchemy import create_engine
+from sqlalchemy.orm import Session, sessionmaker
 from werkzeug.local import LocalProxy
 
 from src.config import config
 
-ctx_session: ContextVar[Session] = ContextVar("session")
+ctx_session: ContextVar["Session"] = ContextVar("session")
 
 
 class DB:
@@ -33,13 +34,14 @@ class DB:
             pool_size=pool_size,
             pool_recycle=7200,
         )
+        self.Session = sessionmaker(self.engine)
         app.extensions["sqlalchemy"] = self
 
-    def connect(self) -> Session:
+    def connect(self) -> "Session":
         """生成新的 session."""
         # session 并不代表连接 只有 exec 时才会真正连接数据库
         # session 可以看作是本地缓存
-        return Session(self.engine)
+        return self.Session()
 
     def teardown_request(self, exception: BaseException | None) -> None:
         try:
@@ -55,5 +57,4 @@ class DB:
 
 
 db = DB()
-
-session = cast(Session, LocalProxy(ctx_session))
+session = cast("Session", LocalProxy(ctx_session))

@@ -1,28 +1,27 @@
 from datetime import datetime
-from typing import Self
+from typing import Any, Self
 
-from sqlmodel import Field, Index, col, select
+from sqlalchemy import Index, String, select
+from sqlalchemy.orm import Mapped, mapped_column
+from src.app.model.base import BaseModel
 from src.common.db import session
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from .base import BaseSQLModel
 
-
-class User(BaseSQLModel, table=True):
-    id: int | None = Field(default=None, primary_key=True)
-    username: str = Field(max_length=20, index=True)
-    mobile: str = Field(nullable=False, unique=True, index=True)
-    password: str | None = None
-    company: str | None = Field(default=None, max_length=50)
-    career: str | None = Field(default=None, max_length=50)
-    home_url: str | None = Field(default=None, max_length=100)
-    slogan: str | None = Field(default=None, max_length=200)
-    avatar: str | None = Field(default=None)
-    github: str | None = Field(default=None)
-    email: str | None = Field(default=None, unique=True, nullable=True)
-    status: int = Field(default=0, description="状态，0-正常，1-未激活，2-禁言，3-拉黑")
-    last_login: datetime = Field(default_factory=datetime.now)
-    is_deleted: bool = Field(default=0, description="是否删除")
+class User(BaseModel):
+    username: Mapped[str] = mapped_column(max_length=20, index=True)
+    mobile: Mapped[str] = mapped_column(nullable=False, unique=True, index=True)
+    password: Mapped[str] = mapped_column(init=False)
+    company: Mapped[str] = mapped_column(default=None, max_length=50)
+    career: Mapped[str] = mapped_column(default=None, max_length=50)
+    home_url: Mapped[str] = mapped_column(default=None, max_length=100)
+    slogan: Mapped[str] = mapped_column(default=None, max_length=200)
+    avatar: Mapped[str] = mapped_column(default=None)
+    github: Mapped[str] = mapped_column(default=None)
+    email: Mapped[str] = mapped_column(default=None, unique=True, nullable=True)
+    status: Mapped[int] = mapped_column(default=0, comment="状态: 0-正常, 1-未激活, 2-禁言, 3-拉黑")
+    last_login: Mapped[datetime] = mapped_column(default_factory=datetime.now)
+    is_deleted: Mapped[int] = mapped_column(default=0, comment="是否删除")
 
     __table_args__ = (Index("username_del", "username", "is_deleted", unique=True),)
 
@@ -38,22 +37,22 @@ class User(BaseSQLModel, table=True):
         with session:
             # 查找用户所属分组 id
             statement = select(GroupUser.group_id).where(GroupUser.user_id == self.id)
-            group_ids = session.exec(statement).all()
+            group_ids = session.scalars(statement).all()
             # 查找分组的所有权限 名称
             statement = (
-                select(Permission.name)
+                select(Permission.name)  # type: ignore
                 .join(GroupPermission, GroupPermission.permission_id == Permission.id)
-                .where(col(GroupPermission.group_id).in_(group_ids))
+                .where(GroupPermission.group_id.in_(group_ids))
             )
-            has_permission_name = session.exec(statement).all()  # 用户拥有的权限
-            if has_permission_name and (auth in has_permission_name):
+            has_permission_name = session.scalars(statement).all()  # 用户拥有的权限
+            if has_permission_name and (auth in has_permission_name):  # type: ignore
                 return True
             return False
 
     def is_admin(self) -> bool:
         with session:
             statement = select(GroupUser.group_id).where(GroupUser.user_id == self.id)
-            group_ids = session.exec(statement).all()
+            group_ids = session.scalars(statement).all()
             if 1 in group_ids:  # TODO: admin group 是否存在
                 return True
             return False
@@ -61,7 +60,7 @@ class User(BaseSQLModel, table=True):
     def is_auth(self) -> bool:
         with session:
             statement = select(GroupUser.group_id).where(GroupUser.user_id == self.id)
-            group_ids = session.exec(statement).all()
+            group_ids = session.scalars(statement).all()
             if 3 in group_ids:  # TODO: author group 是否存在
                 return True
             return False
@@ -79,7 +78,7 @@ class User(BaseSQLModel, table=True):
         ...     return None
         >>> return check_password(password, user.password)
         """
-        one = session.exec(cls.username == username).first()
+        one = cls.get_model_by_attr(username=username)
         if one:
             return one.check_password(password)
         return None
@@ -93,47 +92,42 @@ class User(BaseSQLModel, table=True):
         """
         return None  # TODO
 
-    def has_permission(self, meta: "PermissionMeta") -> bool:
+    def has_permission(self, meta: Any) -> bool:
         return True
 
 
-class Group(BaseSQLModel, table=True):
-    id: int | None = Field(default=None, primary_key=True)
-    name: str = Field(max_length=20, nullable=False, description="分组名称")
-    info: str | None = Field(default=None)
+class Group(BaseModel):
+    name: Mapped[str] = mapped_column(String(20), comment="分组名称")
+    info: Mapped[str] = mapped_column(default=None)
 
 
-class Permission(BaseSQLModel, table=True):
-    id: int | None = Field(default=None, primary_key=True)
-    name: str = Field(max_length=32, nullable=False, description="权限名称")
-    module: str = Field(max_length=20, nullable=False, description="所属权限模块")
-    info: str | None = Field(default=None)
+class Permission(BaseModel):
+    name: Mapped[str] = mapped_column(max_length=32, nullable=False, comment="权限名称")
+    module: Mapped[str] = mapped_column(String(20), comment="所属权限模块")
+    info: Mapped[str] = mapped_column(default=None)
 
     __table_args__ = (Index("name_module", "name", "module", unique=True),)
 
 
-class GroupUser(BaseSQLModel, table=True):
-    id: int | None = Field(default=None, primary_key=True)
-    group_id: int
-    user_id: int
+class GroupUser(BaseModel):
+    group_id: Mapped[int]
+    user_id: Mapped[int]
 
     __table_args__ = (Index("user_id_group_id", "user_id", "group_id"),)
 
 
-class GroupPermission(BaseSQLModel, table=True):
-    id: int | None = Field(default=None, primary_key=True)
-    group_id: int
-    permission_id: int
+class GroupPermission(BaseModel):
+    group_id: Mapped[int]
+    permission_id: Mapped[int]
 
     __tableargs__ = (Index("group_id_permission_id", "group_id", "permission_id", unique=True),)
 
 
-class Log(BaseSQLModel, table=True):
-    id: int | None = Field(default=None, primary_key=True)
-    user_id: int
-    username: str
-    message: str
-    path: str
-    method: str
-    create_time: int
-    source: str  # func_name? data name?
+class Log(BaseModel):
+    user_id: Mapped[int]
+    username: Mapped[str]
+    message: Mapped[str]
+    path: Mapped[str]
+    method: Mapped[str]
+    create_time: Mapped[int]
+    source: Mapped[str]  # func_name? data name?

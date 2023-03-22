@@ -1,5 +1,5 @@
 from flask import Blueprint
-from sqlmodel import col, or_, select
+from sqlalchemy import or_, select
 from src.common.auth import current_user, login_required
 from src.common.auth.auth import JWTToken
 from src.common.db import session
@@ -38,8 +38,8 @@ def register(body: ResigerSchema):
     if body.code != code:
         raise ParameterError(message="验证码不正确，请重试")
     with session:
-        existed = session.exec(
-            select(User).where(or_(col(User.username) == body.username, col(User.mobile) == body.mobile))
+        existed = session.scalars(
+            select(User).where(or_((User.username) == body.username, (User.mobile) == body.mobile))
         ).first()
         if existed:
             raise ParameterError(message="用户名或手机号已存在，请更换")
@@ -120,8 +120,8 @@ def get_self_info():
     """获得自己的信息"""
     user = current_user.get()
     with session:
-        groups = session.exec(
-            select(col(Group.id), col(Group.name))  # type: ignore
+        groups = session.scalars(
+            select((Group.id), (Group.name))  # type: ignore
             .join(GroupUser, Group.id == GroupUser.group_id)
             .where(GroupUser.user_id == user.id)
         ).all()
@@ -135,10 +135,10 @@ def get_self_info():
         )
         data["groups"] = groups
         # 获得权限列表
-        permissions = session.exec(
+        permissions = session.scalars(
             select(Permission.name)
             .join(GroupPermission, Permission.id == GroupPermission.permission_id)
-            .where(col(GroupPermission.group_id).in_([item[0] for item in groups]))
+            .where((GroupPermission.group_id).in_([item[0] for item in groups]))
         ).all()
         data["permissions"] = permissions  # 用户权限
         return data

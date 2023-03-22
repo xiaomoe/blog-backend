@@ -1,5 +1,5 @@
 from flask import Blueprint
-from sqlmodel import select
+from sqlalchemy import select
 from src.common.auth import current_user, permission_meta
 from src.common.db import session
 from src.util.exception import Created, ParameterError
@@ -16,7 +16,7 @@ bp = Blueprint("comment", __name__, url_prefix="/comment")
 @parameter(CommentSchema)
 def get_comments(params: CommentSchema):
     with session:
-        comments = session.exec(
+        comments = session.scalars(
             select(Comment)
             .where(Comment.post_id == params.post_id, Comment.root_id == 0)
             .offset(params.page * params.count)
@@ -30,7 +30,7 @@ def get_comments(params: CommentSchema):
             "items": [],
         }
         for comment in comments:
-            replay = session.exec(select(Comment).where(Comment.root_id == comment.id).limit(3)).all()
+            replay = session.scalars(select(Comment).where(Comment.root_id == comment.id).limit(3)).all()
             item = comment.dict()
             item["replay"] = replay
             res["items"].append(item)
@@ -44,7 +44,7 @@ def get_replay(params: ReplaySchema):
     if comment is None:
         raise ParameterError(message="评论不存在")
     with session:
-        replay = session.exec(
+        replay = session.scalars(
             select(Comment)
             .where(Comment.root_id == params.comment_id)
             .offset(params.page * params.count)

@@ -1,5 +1,5 @@
 from flask import Blueprint
-from sqlmodel import col, delete, func, select, update
+from sqlalchemy import delete, func, select, update
 from src.common.auth import admin_required, current_user
 from src.common.auth.auth import JWTToken
 from src.common.db import session
@@ -244,7 +244,7 @@ def get_posts(params: PostSchema):
     if params.start_date is not None and params.end_date is not None:  # 有start_date 则必须有 end_date
         if params.start_date > params.end_date:
             raise ParameterError(message="结束时间必须大于等于起始时间")
-        statement = statement.where(col(Post.create_time).between(params.start_date, params.end_date))
+        statement = statement.where(Post.create_time.between(params.start_date, params.end_date))
     statement.offset(params.count * params.page).limit(params.count)
     with session:
         result = session.exec(statement).all()
