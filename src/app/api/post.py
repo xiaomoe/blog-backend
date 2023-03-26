@@ -169,7 +169,7 @@ def update_category(body: CategoryCreateSchema, id: int) -> ResponseValue:
         raise ParameterError(message="分类不存在")
     existed = Category.get_model_by_attr(name=body.name)
     if existed and existed.id != id:
-        raise ParameterError(message="分类名称已经存在，请更换")
+        raise ParameterError(message="分类名称已经存在, 请更换")
     cate.update(body.dict())
     cate.save()
     return Updated(message="修改分类成功").to_dict()
@@ -217,7 +217,7 @@ def post_like(body: PostLikeSchema) -> ResponseValue:
     if body.type == 1:
         # 点赞
         if attitude is not None:
-            raise ParameterError(message="已经点赞成功，请勿重复操作")
+            raise ParameterError(message="已经点赞成功, 请勿重复操作")
         attitude = PostLike(post_id=body.post_id, user_id=user.id, attitude=1)  # type: ignore
         post.like_count += 1
         with session:
@@ -226,7 +226,7 @@ def post_like(body: PostLikeSchema) -> ResponseValue:
         # 取消点赞
         attitude = PostLike.get_model_by_attr(post_id=body.post_id, user_id=user.id, attitude=1)
         if attitude is None:
-            raise ParameterError(message="已经取消点赞成功，请勿重复操作")
+            raise ParameterError(message="已经取消点赞成功, 请勿重复操作")
         post.like_count -= 1
         with session:
             session.delete(attitude)

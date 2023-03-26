@@ -244,7 +244,7 @@ sock = Sock()
 
 
 class Message:
-    type: str  # noqa
+    type: str
     message: Any
 
 

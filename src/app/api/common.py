@@ -35,4 +35,4 @@ def generate_digit_code(size: int = 4) -> str:
         str: 验证码
     """
     words = "1234567890"
-    return "".join(random.choices(words, k=size))
+    return "".join(random.choices(words, k=size))  # noqa: S311

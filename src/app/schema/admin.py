@@ -94,5 +94,5 @@ class TagCreateSchema(BaseModel):
 
 
 class CommentUpdateSchema(BaseModel):
-    type: int  # 1-置顶, 2-拉黑  # noqa:A003
+    type: int  # 1-置顶, 2-拉黑
     value: int  # 0-取消, 1-设置

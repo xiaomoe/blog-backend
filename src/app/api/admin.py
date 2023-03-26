@@ -1,6 +1,6 @@
 from flask import Blueprint
 from flask.typing import ResponseValue
-from sqlalchemy import delete, func, select, update
+from sqlalchemy import delete, select, update
 from src.common.auth import admin_required, current_user
 from src.common.auth.auth import JWTToken
 from src.common.db import session
@@ -101,7 +101,7 @@ def get_role_and_permission(id: int) -> ResponseValue:
         permissions = session.scalars(
             select(Permission)
             .join(RolePermission, Permission.id == RolePermission.permission_id)
-            .where(RolePermission.role_id == id)
+            .where(RolePermission.role_id == id),
         ).all()
     return {
         "id": role.id,
@@ -117,7 +117,7 @@ def get_role_and_permission(id: int) -> ResponseValue:
 def create_role(body: GroupCreateSchema) -> ResponseValue:
     existed = Role.get_model_by_attr(name=body.name)
     if existed is not None:
-        raise ParameterError(message="分组名称已存在，请更换")
+        raise ParameterError(message="分组名称已存在, 请更换")
     role = Role(name=body.name, info=body.info).save()
     if body.permission_ids is not None:
         with session:
@@ -238,7 +238,7 @@ def get_post_detail(id: int) -> ResponseValue:
 @admin_required
 @body(PostStatusSchema)
 def change_post_status(body: PostStatusSchema, id: int) -> ResponseValue:
-    """修改文章状态，置顶还是隐藏."""
+    """修改文章状态, 置顶还是隐藏."""
     post = Post.get_model_by_id(id)
     if post is None:
         raise ParameterError(message="文章不存在")

@@ -1,5 +1,6 @@
+from collections.abc import Sequence
 from datetime import date, datetime
-from typing import TYPE_CHECKING, Any, Self
+from typing import TYPE_CHECKING, Self
 
 from sqlalchemy import BigInteger, Date, Index, SmallInteger, String, select
 from sqlalchemy.orm import Mapped, mapped_column
@@ -8,7 +9,6 @@ from src.common.db import session
 from werkzeug.security import check_password_hash, generate_password_hash
 
 if TYPE_CHECKING:
-    from collections.abc import Sequence
 
     from src.common.auth.permission import PermissionMeta
 

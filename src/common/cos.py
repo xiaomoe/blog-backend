@@ -90,7 +90,7 @@ class COS:
         data = {
             "SecretId": self.secret_id,
             "Timestamp": int(time.time()),
-            "Nonce": random.randint(100000, 200000),
+            "Nonce": random.randint(100000, 200000),  # noqa: S311
             "Action": "GetFederationToken",
             "Version": "2018-08-13",
             "DurationSeconds": self.duration_seconds,

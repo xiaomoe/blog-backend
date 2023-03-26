@@ -92,8 +92,7 @@ class Post(BaseModel):
                     session.refresh(_tag)
                 new_tags.add(_tag.id)
             _tags = session.scalars(select(PostTag).where(PostTag.post_id == self.id)).all()
-            for tag in _tags:
-                old_tags.add(tag.tag_id)
+            old_tags.update(tag.tag_id for tag in _tags)
             in_tags = new_tags - old_tags
             out_tags = old_tags - new_tags
             for in_tag in in_tags:
